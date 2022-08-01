@@ -4,210 +4,210 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace EnhancedDevelopment.ReverseCycleCooler
+namespace EnhancedDevelopment.ReverseCycleCooler;
+
+[StaticConstructorOnStartup]
+public class Building_ReverseCycleCooler : Building_Cooler
 {
-    [StaticConstructorOnStartup]
-    public class Building_ReverseCycleCooler : Building_Cooler
+    private const float HeatOutputMultiplier = 1.25f;
+    private const float EfficiencyLossPerDegreeDifference = 1f / 130f;
+
+    private static readonly Texture2D UI_ROTATE_RIGHT = ContentFinder<Texture2D>.Get("UI/RotRight");
+    private static readonly Texture2D UI_TEMPERATURE_COOLING = ContentFinder<Texture2D>.Get("UI/Temperature_Cooling");
+    private static readonly Texture2D UI_TEMPERATURE_HEATING = ContentFinder<Texture2D>.Get("UI/Temperature_Heating");
+    private static readonly Texture2D UI_TEMPERATURE_AUTO = ContentFinder<Texture2D>.Get("UI/Temperature_Auto");
+
+    private enumCoolerMode m_Mode;
+
+    public override void TickRare()
     {
-        private const float HeatOutputMultiplier = 1.25f;
-        private const float EfficiencyLossPerDegreeDifference = 1f / 130f;
-
-        private static readonly Texture2D UI_ROTATE_RIGHT = ContentFinder<Texture2D>.Get("UI/RotRight");
-        private static readonly Texture2D UI_TEMPERATURE_COOLING = ContentFinder<Texture2D>.Get("UI/Temperature_Cooling");
-        private static readonly Texture2D UI_TEMPERATURE_HEATING = ContentFinder<Texture2D>.Get("UI/Temperature_Heating");
-        private static readonly Texture2D UI_TEMPERATURE_AUTO = ContentFinder<Texture2D>.Get("UI/Temperature_Auto");
-
-        private enumCoolerMode m_Mode;
-
-        public override void TickRare()
+        if (!compPowerTrader.PowerOn)
         {
-            if (!compPowerTrader.PowerOn)
+            return;
+        }
+
+        var coldSide = Position + IntVec3.South.RotatedBy(Rotation); // formerly known as intVect
+        var hotSide = Position + ReplaceStuffFix.adjustedNorth(this).RotatedBy(Rotation); // formerly known as intVect2
+
+        var idle = false;
+        if (!hotSide.Impassable(Map) && !coldSide.Impassable(Map))
+        {
+            var temperatureOnHot = hotSide.GetTemperature(Map); // formerly known as temperature
+            var temperatureOnCold = coldSide.GetTemperature(Map); // formerly known as temperature2
+            var cooling = true;
+
+            switch (m_Mode)
             {
-                return;
+                case enumCoolerMode.Heating:
+                    cooling = false;
+                    break;
+                case enumCoolerMode.Auto:
+                    cooling = temperatureOnHot > compTempControl.targetTemperature;
+                    break;
             }
 
-            var coldSide = Position + IntVec3.South.RotatedBy(Rotation); // formerly known as intVect
-            var hotSide = Position + ReplaceStuffFix.adjustedNorth(this).RotatedBy(Rotation); // formerly known as intVect2
+            float energyLimit; // formerly known as num3
 
-            var idle = false;
-            if (!hotSide.Impassable(Map) && !coldSide.Impassable(Map))
+            var tempDif = temperatureOnHot - temperatureOnCold; // formerly known as num & num5
+
+            if (cooling)
             {
-                var temperatureOnHot = hotSide.GetTemperature(Map); // formerly known as temperature
-                var temperatureOnCold = coldSide.GetTemperature(Map); // formerly known as temperature2
-                var cooling = true;
-
-                switch (m_Mode)
+                if (temperatureOnHot - 40.0 > tempDif)
                 {
-                    case enumCoolerMode.Heating:
-                        cooling = false;
-                        break;
-                    case enumCoolerMode.Auto:
-                        cooling = temperatureOnHot > compTempControl.targetTemperature;
-                        break;
+                    tempDif = temperatureOnHot - 40f;
                 }
 
-                float energyLimit; // formerly known as num3
-                float newTemp; // formerly known as num4
-
-                float tempDif = temperatureOnHot - temperatureOnCold; // formerly known as num & num5
-
-                if (cooling)
+                var energyCost = 1f - (tempDif * EfficiencyLossPerDegreeDifference); // formerly known as num2
+                if (energyCost < 0.0)
                 {
-                    if (temperatureOnHot - 40.0 > tempDif)
-                    {
-                        tempDif = temperatureOnHot - 40f;
-                    }
-
-                    float energyCost = 1f - (tempDif * EfficiencyLossPerDegreeDifference); // formerly known as num2
-                    if (energyCost < 0.0)
-                    {
-                        energyCost = 0f;
-                    }
-
-                    energyLimit = compTempControl.Props.energyPerSecond * energyCost * 4.16666651f;
-                }
-                else
-                {
-                    if (temperatureOnHot + 40.0 > tempDif)
-                    {
-                        tempDif = temperatureOnHot + 40f;
-                    }
-
-                    float energyCost = 1f - (tempDif * EfficiencyLossPerDegreeDifference); // formerly known as num6
-                    if (energyCost < 0.0)
-                    {
-                        energyCost = 0f;
-                    }
-
-                    energyLimit = compTempControl.Props.energyPerSecond * -energyCost * 4.16666651f;
+                    energyCost = 0f;
                 }
 
-                newTemp = GenTemperature.ControlTemperatureTempChange(coldSide, Map, energyLimit, compTempControl.targetTemperature);
-                idle = !Mathf.Approximately(newTemp, 0f);
-
-                if (idle)
-                {
-                    hotSide.GetRoom(Map).Temperature -= newTemp;
-                    GenTemperature.PushHeat(coldSide, Map, (float)(energyLimit * HeatOutputMultiplier));
-                }
-            }
-
-            var props = compPowerTrader.Props;
-            if (idle)
-            {
-                compPowerTrader.PowerOutput = -props.basePowerConsumption;
+                energyLimit = compTempControl.Props.energyPerSecond * energyCost * 4.16666651f;
             }
             else
             {
-                compPowerTrader.PowerOutput =
-                    -props.basePowerConsumption * compTempControl.Props.lowPowerConsumptionFactor;
+                if (temperatureOnHot + 40.0 > tempDif)
+                {
+                    tempDif = temperatureOnHot + 40f;
+                }
+
+                var energyCost = 1f - (tempDif * EfficiencyLossPerDegreeDifference); // formerly known as num6
+                if (energyCost < 0.0)
+                {
+                    energyCost = 0f;
+                }
+
+                energyLimit = compTempControl.Props.energyPerSecond * -energyCost * 4.16666651f;
             }
 
-            compTempControl.operatingAtHighPower = idle;
-        }
+            var newTemp = GenTemperature.ControlTemperatureTempChange(coldSide, Map,
+                energyLimit, // formerly known as num4
+                compTempControl.targetTemperature);
+            idle = !Mathf.Approximately(newTemp, 0f);
 
-        public override IEnumerable<Gizmo> GetGizmos()
-        {
-            foreach (var gizmo in base.GetGizmos())
+            if (idle)
             {
-                yield return gizmo;
-            }
-
-            yield return new Command_Action
-            {
-                action = ChangeRotation,
-                icon = UI_ROTATE_RIGHT,
-                defaultLabel = "Rotate",
-                defaultDesc = "Rotates",
-                activateSound = SoundDef.Named("Click")
-            };
-            switch (m_Mode)
-            {
-                case enumCoolerMode.Cooling:
-                    yield return new Command_Action
-                    {
-                        action = ChangeMode,
-                        icon = UI_TEMPERATURE_COOLING,
-                        defaultLabel = "Cooling",
-                        defaultDesc = "Cooling",
-                        activateSound = SoundDef.Named("Click")
-                    };
-                    break;
-                case enumCoolerMode.Heating:
-                    yield return new Command_Action
-                    {
-                        action = ChangeMode,
-                        icon = UI_TEMPERATURE_HEATING,
-                        defaultLabel = "Heating",
-                        defaultDesc = "Heating",
-                        activateSound = SoundDef.Named("Click")
-                    };
-                    break;
-                case enumCoolerMode.Auto:
-                    yield return new Command_Action
-                    {
-                        action = ChangeMode,
-                        icon = UI_TEMPERATURE_AUTO,
-                        defaultLabel = "Auto",
-                        defaultDesc = "Auto",
-                        activateSound = SoundDef.Named("Click")
-                    };
-                    break;
+                hotSide.GetRoom(Map).Temperature -= newTemp;
+                GenTemperature.PushHeat(coldSide, Map, energyLimit * HeatOutputMultiplier);
             }
         }
 
-        public void ChangeRotation()
+        var props = compPowerTrader.Props;
+        if (idle)
         {
-            Rotation = new Rot4((Rotation.AsInt + 2) % 4);
-
-            if (ReplaceStuffFix.isWide(this)) // So you can rotate the wide cooler
-			{
-                Position = Position + IntVec3.South.RotatedBy(Rotation);
-			}
-
-            Map.mapDrawer.MapMeshDirty(Position, MapMeshFlag.Things, true, false);
+            compPowerTrader.PowerOutput = -props.basePowerConsumption;
+        }
+        else
+        {
+            compPowerTrader.PowerOutput =
+                -props.basePowerConsumption * compTempControl.Props.lowPowerConsumptionFactor;
         }
 
-        public void ChangeMode()
+        compTempControl.operatingAtHighPower = idle;
+    }
+
+    public override IEnumerable<Gizmo> GetGizmos()
+    {
+        foreach (var gizmo in base.GetGizmos())
         {
-            switch (m_Mode)
-            {
-                case enumCoolerMode.Cooling:
-                    m_Mode = enumCoolerMode.Heating;
-                    return;
-                case enumCoolerMode.Heating:
-                    m_Mode = enumCoolerMode.Auto;
-                    return;
-                case enumCoolerMode.Auto:
-                    m_Mode = enumCoolerMode.Cooling;
-                    break;
-            }
+            yield return gizmo;
         }
 
-        public override string GetInspectString()
+        yield return new Command_Action
         {
-            var stringBuilder = new StringBuilder();
-            switch (m_Mode)
-            {
-                case enumCoolerMode.Cooling:
-                    stringBuilder.AppendLine("Mode: Cooling");
-                    break;
-                case enumCoolerMode.Heating:
-                    stringBuilder.AppendLine("Mode: Heating");
-                    break;
-                case enumCoolerMode.Auto:
-                    stringBuilder.AppendLine("Mode: Auto");
-                    break;
-            }
+            action = ChangeRotation,
+            icon = UI_ROTATE_RIGHT,
+            defaultLabel = "Rotate",
+            defaultDesc = "Rotates",
+            activateSound = SoundDef.Named("Click")
+        };
+        switch (m_Mode)
+        {
+            case enumCoolerMode.Cooling:
+                yield return new Command_Action
+                {
+                    action = ChangeMode,
+                    icon = UI_TEMPERATURE_COOLING,
+                    defaultLabel = "Cooling",
+                    defaultDesc = "Cooling",
+                    activateSound = SoundDef.Named("Click")
+                };
+                break;
+            case enumCoolerMode.Heating:
+                yield return new Command_Action
+                {
+                    action = ChangeMode,
+                    icon = UI_TEMPERATURE_HEATING,
+                    defaultLabel = "Heating",
+                    defaultDesc = "Heating",
+                    activateSound = SoundDef.Named("Click")
+                };
+                break;
+            case enumCoolerMode.Auto:
+                yield return new Command_Action
+                {
+                    action = ChangeMode,
+                    icon = UI_TEMPERATURE_AUTO,
+                    defaultLabel = "Auto",
+                    defaultDesc = "Auto",
+                    activateSound = SoundDef.Named("Click")
+                };
+                break;
+        }
+    }
 
-            stringBuilder.Append(base.GetInspectString());
-            return stringBuilder.ToString();
+    public void ChangeRotation()
+    {
+        Rotation = new Rot4((Rotation.AsInt + 2) % 4);
+
+        if (ReplaceStuffFix.isWide(this)) // So you can rotate the wide cooler
+        {
+            Position += IntVec3.South.RotatedBy(Rotation);
         }
 
-        public override void ExposeData()
+        Map.mapDrawer.MapMeshDirty(Position, MapMeshFlag.Things, true, false);
+    }
+
+    public void ChangeMode()
+    {
+        switch (m_Mode)
         {
-            base.ExposeData();
-            Scribe_Values.Look(ref m_Mode, "m_Mode");
+            case enumCoolerMode.Cooling:
+                m_Mode = enumCoolerMode.Heating;
+                return;
+            case enumCoolerMode.Heating:
+                m_Mode = enumCoolerMode.Auto;
+                return;
+            case enumCoolerMode.Auto:
+                m_Mode = enumCoolerMode.Cooling;
+                break;
         }
+    }
+
+    public override string GetInspectString()
+    {
+        var stringBuilder = new StringBuilder();
+        switch (m_Mode)
+        {
+            case enumCoolerMode.Cooling:
+                stringBuilder.AppendLine("Mode: Cooling");
+                break;
+            case enumCoolerMode.Heating:
+                stringBuilder.AppendLine("Mode: Heating");
+                break;
+            case enumCoolerMode.Auto:
+                stringBuilder.AppendLine("Mode: Auto");
+                break;
+        }
+
+        stringBuilder.Append(base.GetInspectString());
+        return stringBuilder.ToString();
+    }
+
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        Scribe_Values.Look(ref m_Mode, "m_Mode");
     }
 }

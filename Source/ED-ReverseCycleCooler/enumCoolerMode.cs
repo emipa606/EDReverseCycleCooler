@@ -1,9 +1,8 @@
-﻿namespace EnhancedDevelopment.ReverseCycleCooler
+﻿namespace EnhancedDevelopment.ReverseCycleCooler;
+
+public enum enumCoolerMode
 {
-    public enum enumCoolerMode
-    {
-        Cooling,
-        Heating,
-        Auto
-    }
+    Cooling,
+    Heating,
+    Auto
 }
