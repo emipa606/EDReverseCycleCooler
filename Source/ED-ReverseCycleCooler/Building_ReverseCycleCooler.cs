@@ -6,36 +6,19 @@ using Verse;
 
 namespace EnhancedDevelopment.ReverseCycleCooler
 {
-    // Token: 0x02000002 RID: 2
     [StaticConstructorOnStartup]
     public class Building_ReverseCycleCooler : Building_Cooler
     {
-        // Token: 0x04000005 RID: 5
         private const float HeatOutputMultiplier = 1.25f;
+        private const float EfficiencyLossPerDegreeDifference = 1f / 130f;
 
-        // Token: 0x04000006 RID: 6
-        private const float EfficiencyLossPerDegreeDifference = 0.007692308f;
-
-        // Token: 0x04000001 RID: 1
         private static readonly Texture2D UI_ROTATE_RIGHT = ContentFinder<Texture2D>.Get("UI/RotRight");
-
-        // Token: 0x04000002 RID: 2
-        private static readonly Texture2D UI_TEMPERATURE_COOLING =
-            ContentFinder<Texture2D>.Get("UI/Temperature_Cooling");
-
-        // Token: 0x04000003 RID: 3
-        private static readonly Texture2D UI_TEMPERATURE_HEATING =
-            ContentFinder<Texture2D>.Get("UI/Temperature_Heating");
-
-        // Token: 0x04000004 RID: 4
+        private static readonly Texture2D UI_TEMPERATURE_COOLING = ContentFinder<Texture2D>.Get("UI/Temperature_Cooling");
+        private static readonly Texture2D UI_TEMPERATURE_HEATING = ContentFinder<Texture2D>.Get("UI/Temperature_Heating");
         private static readonly Texture2D UI_TEMPERATURE_AUTO = ContentFinder<Texture2D>.Get("UI/Temperature_Auto");
 
-        // Token: 0x04000007 RID: 7
         private enumCoolerMode m_Mode;
 
-        // Token: 0x06000002 RID: 2 RVA: 0x0000209D File Offset: 0x0000029D
-
-        // Token: 0x06000003 RID: 3 RVA: 0x000020A8 File Offset: 0x000002A8
         public override void TickRare()
         {
             if (!compPowerTrader.PowerOn)
@@ -124,7 +107,6 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             compTempControl.operatingAtHighPower = idle;
         }
 
-        // Token: 0x06000004 RID: 4 RVA: 0x0000235C File Offset: 0x0000055C
         public override IEnumerable<Gizmo> GetGizmos()
         {
             foreach (var gizmo in base.GetGizmos())
@@ -175,7 +157,6 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             }
         }
 
-        // Token: 0x06000005 RID: 5 RVA: 0x0000236C File Offset: 0x0000056C
         public void ChangeRotation()
         {
             Rotation = new Rot4((Rotation.AsInt + 2) % 4);
@@ -183,7 +164,6 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             Map.mapDrawer.MapMeshDirty(Position, MapMeshFlag.Things, true, false);
         }
 
-        // Token: 0x06000006 RID: 6 RVA: 0x000023CC File Offset: 0x000005CC
         public void ChangeMode()
         {
             switch (m_Mode)
@@ -200,7 +180,6 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             }
         }
 
-        // Token: 0x06000007 RID: 7 RVA: 0x00002400 File Offset: 0x00000600
         public override string GetInspectString()
         {
             var stringBuilder = new StringBuilder();
@@ -221,7 +200,6 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             return stringBuilder.ToString();
         }
 
-        // Token: 0x06000008 RID: 8 RVA: 0x00002468 File Offset: 0x00000668
         public override void ExposeData()
         {
             base.ExposeData();

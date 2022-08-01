@@ -6,10 +6,8 @@ using Verse;
 
 namespace EnhancedDevelopment.ReverseCycleCooler
 {
-    // Token: 0x02000004 RID: 4
     internal class PlaceWorker_ReverseCycleCooler : PlaceWorker
     {
-        // Token: 0x0600000F RID: 15 RVA: 0x000024A4 File Offset: 0x000006A4
         public override void DrawGhost(ThingDef def, IntVec3 center, Rot4 rot, Color ghostCol, Thing thing = null)
         {
             var currentMap = Find.CurrentMap;
@@ -47,7 +45,6 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             }
         }
 
-        // Token: 0x06000010 RID: 16 RVA: 0x00002594 File Offset: 0x00000794
         public override AcceptanceReport AllowsPlacing(BuildableDef def, IntVec3 center, Rot4 rot, Map map,
             Thing thingToIgnore = null, Thing thing = null)
         {
