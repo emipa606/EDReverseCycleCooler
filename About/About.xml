@@ -12,6 +12,9 @@
   </supportedVersions>
   <modDependencies />
   <loadAfter />
+	<loadBefore>
+		<li>Uuugggg.ReplaceStuff</li>
+	</loadBefore>
   <description>[img]https://i.imgur.com/buuPQel.png[/img]
 Update of Jaxxas mod
 https://steamcommunity.com/sharedfiles/filedetails/?id=722092523
