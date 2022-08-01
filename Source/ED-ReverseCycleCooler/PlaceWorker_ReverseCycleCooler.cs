@@ -13,7 +13,7 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             var currentMap = Find.CurrentMap;
 
             var coldSide = center + IntVec3.South.RotatedBy(rot); // formerly known as intVec
-            var hotSide = center + IntVec3.North.RotatedBy(rot); // formerly known as intVec2
+            var hotSide = center + ReplaceStuffFix.adjustedNorth(def).RotatedBy(rot); // formerly known as intVec2
 
             GenDraw.DrawFieldEdges(new List<IntVec3>
             {
@@ -53,7 +53,7 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             Thing thingToIgnore = null, Thing thing = null)
         {
             var coldSide = center + IntVec3.South.RotatedBy(rot); // formerly known as intVec
-            var hotSide = center + IntVec3.North.RotatedBy(rot); // formerly known as intVec2
+            var hotSide = center + ReplaceStuffFix.adjustedNorth(def).RotatedBy(rot); // formerly known as intVec2
 
             if (coldSide.Impassable(map) || hotSide.Impassable(map))
             {

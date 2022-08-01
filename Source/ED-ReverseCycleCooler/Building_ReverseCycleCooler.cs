@@ -27,7 +27,7 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             }
 
             var coldSide = Position + IntVec3.South.RotatedBy(Rotation); // formerly known as intVect
-            var hotSide = Position + IntVec3.North.RotatedBy(Rotation); // formerly known as intVect2
+            var hotSide = Position + ReplaceStuffFix.adjustedNorth(this).RotatedBy(Rotation); // formerly known as intVect2
 
             var idle = false;
             if (!hotSide.Impassable(Map) && !coldSide.Impassable(Map))
@@ -159,6 +159,11 @@ namespace EnhancedDevelopment.ReverseCycleCooler
         public void ChangeRotation()
         {
             Rotation = new Rot4((Rotation.AsInt + 2) % 4);
+
+            if (ReplaceStuffFix.isWide(this)) // So you can rotate the wide cooler
+			{
+                Position = Position + IntVec3.South.RotatedBy(Rotation);
+			}
 
             Map.mapDrawer.MapMeshDirty(Position, MapMeshFlag.Things, true, false);
         }
