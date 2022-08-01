@@ -26,70 +26,69 @@ namespace EnhancedDevelopment.ReverseCycleCooler
                 return;
             }
 
-            var intVec = Position + IntVec3.South.RotatedBy(Rotation);
-            var intVec2 = Position + IntVec3.North.RotatedBy(Rotation);
+            var coldSide = Position + IntVec3.South.RotatedBy(Rotation); // formerly known as intVect
+            var hotSide = Position + IntVec3.North.RotatedBy(Rotation); // formerly known as intVect2
+
             var idle = false;
-            if (!intVec2.Impassable(Map) && !intVec.Impassable(Map))
+            if (!hotSide.Impassable(Map) && !coldSide.Impassable(Map))
             {
-                var temperature = intVec2.GetTemperature(Map);
-                var temperature2 = intVec.GetTemperature(Map);
+                var temperatureOnHot = hotSide.GetTemperature(Map); // formerly known as temperature
+                var temperatureOnCold = coldSide.GetTemperature(Map); // formerly known as temperature2
                 var cooling = true;
+
                 switch (m_Mode)
                 {
                     case enumCoolerMode.Heating:
                         cooling = false;
                         break;
                     case enumCoolerMode.Auto:
-                        cooling = temperature > compTempControl.targetTemperature;
+                        cooling = temperatureOnHot > compTempControl.targetTemperature;
                         break;
                 }
 
-                float num3;
-                float num4;
+                float energyLimit; // formerly known as num3
+                float newTemp; // formerly known as num4
+
+                float tempDif = temperatureOnHot - temperatureOnCold; // formerly known as num & num5
+
                 if (cooling)
                 {
-                    var num = temperature - temperature2;
-                    if (temperature - 40.0 > num)
+                    if (temperatureOnHot - 40.0 > tempDif)
                     {
-                        num = temperature - 40f;
+                        tempDif = temperatureOnHot - 40f;
                     }
 
-                    var num2 = (float) (1.0 - (num * 0.0076923076923076927));
-                    if (num2 < 0.0)
+                    float energyCost = 1f - (tempDif * EfficiencyLossPerDegreeDifference); // formerly known as num2
+                    if (energyCost < 0.0)
                     {
-                        num2 = 0f;
+                        energyCost = 0f;
                     }
 
-                    num3 = (float) (compTempControl.Props.energyPerSecond * (double) num2 * 4.16666650772095);
-                    num4 = GenTemperature.ControlTemperatureTempChange(intVec, Map, num3,
-                        compTempControl.targetTemperature);
-                    idle = !Mathf.Approximately(num4, 0f);
+                    energyLimit = compTempControl.Props.energyPerSecond * energyCost * 4.16666651f;
                 }
                 else
                 {
-                    var num5 = temperature - temperature2;
-                    if (temperature + 40.0 > num5)
+                    if (temperatureOnHot + 40.0 > tempDif)
                     {
-                        num5 = temperature + 40f;
+                        tempDif = temperatureOnHot + 40f;
                     }
 
-                    var num6 = (float) (1.0 - (num5 * 0.0076923076923076927));
-                    if (num6 < 0.0)
+                    float energyCost = 1f - (tempDif * EfficiencyLossPerDegreeDifference); // formerly known as num6
+                    if (energyCost < 0.0)
                     {
-                        num6 = 0f;
+                        energyCost = 0f;
                     }
 
-                    num3 = (float) ((double) compTempControl.Props.energyPerSecond * -(float) (double) num6 *
-                                    4.16666650772095);
-                    num4 = GenTemperature.ControlTemperatureTempChange(intVec, Map, num3,
-                        compTempControl.targetTemperature);
-                    idle = !Mathf.Approximately(num4, 0f);
+                    energyLimit = compTempControl.Props.energyPerSecond * -energyCost * 4.16666651f;
                 }
+
+                newTemp = GenTemperature.ControlTemperatureTempChange(coldSide, Map, energyLimit, compTempControl.targetTemperature);
+                idle = !Mathf.Approximately(newTemp, 0f);
 
                 if (idle)
                 {
-                    intVec2.GetRoom(Map).Temperature -= num4;
-                    GenTemperature.PushHeat(intVec, Map, (float) (num3 * 1.25));
+                    hotSide.GetRoom(Map).Temperature -= newTemp;
+                    GenTemperature.PushHeat(coldSide, Map, (float)(energyLimit * HeatOutputMultiplier));
                 }
             }
 
