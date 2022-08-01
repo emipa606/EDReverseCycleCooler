@@ -6,36 +6,19 @@ using Verse;
 
 namespace EnhancedDevelopment.ReverseCycleCooler
 {
-    // Token: 0x02000002 RID: 2
     [StaticConstructorOnStartup]
     public class Building_ReverseCycleCooler : Building_Cooler
     {
-        // Token: 0x04000005 RID: 5
         private const float HeatOutputMultiplier = 1.25f;
+        private const float EfficiencyLossPerDegreeDifference = 1f / 130f;
 
-        // Token: 0x04000006 RID: 6
-        private const float EfficiencyLossPerDegreeDifference = 0.007692308f;
-
-        // Token: 0x04000001 RID: 1
         private static readonly Texture2D UI_ROTATE_RIGHT = ContentFinder<Texture2D>.Get("UI/RotRight");
-
-        // Token: 0x04000002 RID: 2
-        private static readonly Texture2D UI_TEMPERATURE_COOLING =
-            ContentFinder<Texture2D>.Get("UI/Temperature_Cooling");
-
-        // Token: 0x04000003 RID: 3
-        private static readonly Texture2D UI_TEMPERATURE_HEATING =
-            ContentFinder<Texture2D>.Get("UI/Temperature_Heating");
-
-        // Token: 0x04000004 RID: 4
+        private static readonly Texture2D UI_TEMPERATURE_COOLING = ContentFinder<Texture2D>.Get("UI/Temperature_Cooling");
+        private static readonly Texture2D UI_TEMPERATURE_HEATING = ContentFinder<Texture2D>.Get("UI/Temperature_Heating");
         private static readonly Texture2D UI_TEMPERATURE_AUTO = ContentFinder<Texture2D>.Get("UI/Temperature_Auto");
 
-        // Token: 0x04000007 RID: 7
         private enumCoolerMode m_Mode;
 
-        // Token: 0x06000002 RID: 2 RVA: 0x0000209D File Offset: 0x0000029D
-
-        // Token: 0x06000003 RID: 3 RVA: 0x000020A8 File Offset: 0x000002A8
         public override void TickRare()
         {
             if (!compPowerTrader.PowerOn)
@@ -43,70 +26,69 @@ namespace EnhancedDevelopment.ReverseCycleCooler
                 return;
             }
 
-            var intVec = Position + IntVec3.South.RotatedBy(Rotation);
-            var intVec2 = Position + IntVec3.North.RotatedBy(Rotation);
+            var coldSide = Position + IntVec3.South.RotatedBy(Rotation); // formerly known as intVect
+            var hotSide = Position + ReplaceStuffFix.adjustedNorth(this).RotatedBy(Rotation); // formerly known as intVect2
+
             var idle = false;
-            if (!intVec2.Impassable(Map) && !intVec.Impassable(Map))
+            if (!hotSide.Impassable(Map) && !coldSide.Impassable(Map))
             {
-                var temperature = intVec2.GetTemperature(Map);
-                var temperature2 = intVec.GetTemperature(Map);
+                var temperatureOnHot = hotSide.GetTemperature(Map); // formerly known as temperature
+                var temperatureOnCold = coldSide.GetTemperature(Map); // formerly known as temperature2
                 var cooling = true;
+
                 switch (m_Mode)
                 {
                     case enumCoolerMode.Heating:
                         cooling = false;
                         break;
                     case enumCoolerMode.Auto:
-                        cooling = temperature > compTempControl.targetTemperature;
+                        cooling = temperatureOnHot > compTempControl.targetTemperature;
                         break;
                 }
 
-                float num3;
-                float num4;
+                float energyLimit; // formerly known as num3
+                float newTemp; // formerly known as num4
+
+                float tempDif = temperatureOnHot - temperatureOnCold; // formerly known as num & num5
+
                 if (cooling)
                 {
-                    var num = temperature - temperature2;
-                    if (temperature - 40.0 > num)
+                    if (temperatureOnHot - 40.0 > tempDif)
                     {
-                        num = temperature - 40f;
+                        tempDif = temperatureOnHot - 40f;
                     }
 
-                    var num2 = (float) (1.0 - (num * 0.0076923076923076927));
-                    if (num2 < 0.0)
+                    float energyCost = 1f - (tempDif * EfficiencyLossPerDegreeDifference); // formerly known as num2
+                    if (energyCost < 0.0)
                     {
-                        num2 = 0f;
+                        energyCost = 0f;
                     }
 
-                    num3 = (float) (compTempControl.Props.energyPerSecond * (double) num2 * 4.16666650772095);
-                    num4 = GenTemperature.ControlTemperatureTempChange(intVec, Map, num3,
-                        compTempControl.targetTemperature);
-                    idle = !Mathf.Approximately(num4, 0f);
+                    energyLimit = compTempControl.Props.energyPerSecond * energyCost * 4.16666651f;
                 }
                 else
                 {
-                    var num5 = temperature - temperature2;
-                    if (temperature + 40.0 > num5)
+                    if (temperatureOnHot + 40.0 > tempDif)
                     {
-                        num5 = temperature + 40f;
+                        tempDif = temperatureOnHot + 40f;
                     }
 
-                    var num6 = (float) (1.0 - (num5 * 0.0076923076923076927));
-                    if (num6 < 0.0)
+                    float energyCost = 1f - (tempDif * EfficiencyLossPerDegreeDifference); // formerly known as num6
+                    if (energyCost < 0.0)
                     {
-                        num6 = 0f;
+                        energyCost = 0f;
                     }
 
-                    num3 = (float) ((double) compTempControl.Props.energyPerSecond * -(float) (double) num6 *
-                                    4.16666650772095);
-                    num4 = GenTemperature.ControlTemperatureTempChange(intVec, Map, num3,
-                        compTempControl.targetTemperature);
-                    idle = !Mathf.Approximately(num4, 0f);
+                    energyLimit = compTempControl.Props.energyPerSecond * -energyCost * 4.16666651f;
                 }
+
+                newTemp = GenTemperature.ControlTemperatureTempChange(coldSide, Map, energyLimit, compTempControl.targetTemperature);
+                idle = !Mathf.Approximately(newTemp, 0f);
 
                 if (idle)
                 {
-                    intVec2.GetRoom(Map).Temperature -= num4;
-                    GenTemperature.PushHeat(intVec, Map, (float) (num3 * 1.25));
+                    hotSide.GetRoom(Map).Temperature -= newTemp;
+                    GenTemperature.PushHeat(coldSide, Map, (float)(energyLimit * HeatOutputMultiplier));
                 }
             }
 
@@ -124,7 +106,6 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             compTempControl.operatingAtHighPower = idle;
         }
 
-        // Token: 0x06000004 RID: 4 RVA: 0x0000235C File Offset: 0x0000055C
         public override IEnumerable<Gizmo> GetGizmos()
         {
             foreach (var gizmo in base.GetGizmos())
@@ -175,15 +156,18 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             }
         }
 
-        // Token: 0x06000005 RID: 5 RVA: 0x0000236C File Offset: 0x0000056C
         public void ChangeRotation()
         {
             Rotation = new Rot4((Rotation.AsInt + 2) % 4);
 
+            if (ReplaceStuffFix.isWide(this)) // So you can rotate the wide cooler
+			{
+                Position = Position + IntVec3.South.RotatedBy(Rotation);
+			}
+
             Map.mapDrawer.MapMeshDirty(Position, MapMeshFlag.Things, true, false);
         }
 
-        // Token: 0x06000006 RID: 6 RVA: 0x000023CC File Offset: 0x000005CC
         public void ChangeMode()
         {
             switch (m_Mode)
@@ -200,7 +184,6 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             }
         }
 
-        // Token: 0x06000007 RID: 7 RVA: 0x00002400 File Offset: 0x00000600
         public override string GetInspectString()
         {
             var stringBuilder = new StringBuilder();
@@ -221,7 +204,6 @@ namespace EnhancedDevelopment.ReverseCycleCooler
             return stringBuilder.ToString();
         }
 
-        // Token: 0x06000008 RID: 8 RVA: 0x00002468 File Offset: 0x00000668
         public override void ExposeData()
         {
             base.ExposeData();

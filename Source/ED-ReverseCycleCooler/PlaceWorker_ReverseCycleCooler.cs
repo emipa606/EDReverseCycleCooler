@@ -6,72 +6,73 @@ using Verse;
 
 namespace EnhancedDevelopment.ReverseCycleCooler
 {
-    // Token: 0x02000004 RID: 4
     internal class PlaceWorker_ReverseCycleCooler : PlaceWorker
     {
-        // Token: 0x0600000F RID: 15 RVA: 0x000024A4 File Offset: 0x000006A4
         public override void DrawGhost(ThingDef def, IntVec3 center, Rot4 rot, Color ghostCol, Thing thing = null)
         {
             var currentMap = Find.CurrentMap;
-            var intVec = center + IntVec3.South.RotatedBy(rot);
-            var intVec2 = center + IntVec3.North.RotatedBy(rot);
+
+            var coldSide = center + IntVec3.South.RotatedBy(rot); // formerly known as intVec
+            var hotSide = center + ReplaceStuffFix.adjustedNorth(def).RotatedBy(rot); // formerly known as intVec2
+
             GenDraw.DrawFieldEdges(new List<IntVec3>
             {
-                intVec
+                coldSide
             }, Color.magenta);
+
             GenDraw.DrawFieldEdges(new List<IntVec3>
             {
-                intVec2
+                hotSide
             }, GenTemperature.ColorSpotHot);
-            var roomGroup = intVec2.GetRoom(currentMap);
-            var roomGroup2 = intVec.GetRoom(currentMap);
-            if (roomGroup == null || roomGroup2 == null)
+
+            var hotRoom = hotSide.GetRoom(currentMap); // formerly known as roomGroup
+            var coldRoom = coldSide.GetRoom(currentMap); // formerly known as roomGroup2
+            if (hotRoom == null || coldRoom == null)
             {
                 return;
             }
 
-            if (roomGroup == roomGroup2 && !roomGroup.UsesOutdoorTemperature)
+            if (hotRoom == coldRoom && !hotRoom.UsesOutdoorTemperature)
             {
-                GenDraw.DrawFieldEdges(roomGroup.Cells.ToList(), new Color(1f, 0.7f, 0f, 0.5f));
+                GenDraw.DrawFieldEdges(hotRoom.Cells.ToList(), new Color(1f, 0.7f, 0f, 0.5f));
                 return;
             }
 
-            if (!roomGroup.UsesOutdoorTemperature)
+            if (!hotRoom.UsesOutdoorTemperature)
             {
-                GenDraw.DrawFieldEdges(roomGroup.Cells.ToList(), GenTemperature.ColorRoomHot);
+                GenDraw.DrawFieldEdges(hotRoom.Cells.ToList(), GenTemperature.ColorRoomHot);
             }
 
-            if (!roomGroup2.UsesOutdoorTemperature)
+            if (!coldRoom.UsesOutdoorTemperature)
             {
-                GenDraw.DrawFieldEdges(roomGroup2.Cells.ToList(), Color.magenta);
+                GenDraw.DrawFieldEdges(coldRoom.Cells.ToList(), Color.magenta);
             }
         }
 
-        // Token: 0x06000010 RID: 16 RVA: 0x00002594 File Offset: 0x00000794
         public override AcceptanceReport AllowsPlacing(BuildableDef def, IntVec3 center, Rot4 rot, Map map,
             Thing thingToIgnore = null, Thing thing = null)
         {
-            var intVec = center + IntVec3.South.RotatedBy(rot);
-            var intVec2 = center + IntVec3.North.RotatedBy(rot);
-            if (intVec.Impassable(map) || intVec2.Impassable(map))
+            var coldSide = center + IntVec3.South.RotatedBy(rot); // formerly known as intVec
+            var hotSide = center + ReplaceStuffFix.adjustedNorth(def).RotatedBy(rot); // formerly known as intVec2
+
+            if (coldSide.Impassable(map) || hotSide.Impassable(map))
             {
                 return "MustPlaceCoolerWithFreeSpaces".Translate();
             }
 
-            var firstThing = intVec.GetFirstThing<Frame>(map);
-            var firstThing2 = intVec2.GetFirstThing<Frame>(map);
-            if (firstThing != null && firstThing.def.entityDefToBuild is {passability: Traversability.Impassable} ||
-                firstThing2 != null &&
-                firstThing2.def.entityDefToBuild is {passability: Traversability.Impassable})
+            var firstFrameOnCold = coldSide.GetFirstThing<Frame>(map); // formerly known as firstThing
+            var firstFrameOnHot = hotSide.GetFirstThing<Frame>(map); // formerly known as firstThing2
+            if (firstFrameOnCold != null && firstFrameOnCold.def.entityDefToBuild is {passability: Traversability.Impassable} ||
+                firstFrameOnHot != null && firstFrameOnHot.def.entityDefToBuild is {passability: Traversability.Impassable})
             {
                 return "MustPlaceCoolerWithFreeSpaces".Translate();
             }
 
-            var firstThing3 = intVec.GetFirstThing<Blueprint>(map);
-            var firstThing4 = intVec2.GetFirstThing<Blueprint>(map);
-            if (firstThing3 != null && firstThing3.def.entityDefToBuild is {passability: Traversability.Impassable} ||
-                firstThing4 != null &&
-                firstThing4.def.entityDefToBuild is {passability: Traversability.Impassable})
+            var firstBlueprintOnCold = coldSide.GetFirstThing<Blueprint>(map); // formerly known as firstThing3
+            var firstBlueprintOnHot = hotSide.GetFirstThing<Blueprint>(map); // formerly known as firstThing4
+            if (firstBlueprintOnCold != null && firstBlueprintOnCold.def.entityDefToBuild is {passability: Traversability.Impassable} ||
+                firstBlueprintOnHot != null &&
+                firstBlueprintOnHot.def.entityDefToBuild is {passability: Traversability.Impassable})
             {
                 return "MustPlaceCoolerWithFreeSpaces".Translate();
             }
