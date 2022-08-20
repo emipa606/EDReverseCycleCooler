@@ -1,5 +1,8 @@
 # Changelog for EDReverseCycleCooler
 
+1.3.2 - Fixed the Replace-stuff 2Wide cooler code, not sure how it could have worked before tbh
+
+
 1.3.1 - Fix for Over-wall cooler (wide) from Replace Stuff, thank you Honza2268 for the fix!
 
 

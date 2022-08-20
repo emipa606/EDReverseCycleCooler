@@ -1,5 +1,4 @@
-﻿using RimWorld;
-using Verse;
+﻿using Verse;
 
 namespace EnhancedDevelopment.ReverseCycleCooler;
 /********************************************************************************************\
@@ -8,21 +7,23 @@ namespace EnhancedDevelopment.ReverseCycleCooler;
 
 internal class ReplaceStuffFix
 {
-    public static bool isWide(object o)
+    public static bool isWide(string defName)
     {
-        var thingDef = o as ThingDef ?? (o as Thing)?.def;
-
-        return thingDef == OverWallDef.Cooler_Over2W || thingDef?.entityDefToBuild == OverWallDef.Cooler_Over2W;
+        return defName == "Cooler_Over2W";
     }
 
-    public static IntVec3 adjustedNorth(object o)
+    public static IntVec3 adjustedNorth(ThingDef thingDef)
     {
-        return isWide(o) ? IntVec3.North * 2 : IntVec3.North;
+        return isWide(thingDef.defName) ? IntVec3.North * 2 : IntVec3.North;
     }
-}
 
-[DefOf]
-public class OverWallDef
-{
-    public static ThingDef Cooler_Over2W;
+    public static IntVec3 adjustedNorth(Building building)
+    {
+        return isWide(building.def.defName) ? IntVec3.North * 2 : IntVec3.North;
+    }
+
+    public static IntVec3 adjustedNorth(BuildableDef buildableDef)
+    {
+        return isWide(buildableDef.defName) ? IntVec3.North * 2 : IntVec3.North;
+    }
 }

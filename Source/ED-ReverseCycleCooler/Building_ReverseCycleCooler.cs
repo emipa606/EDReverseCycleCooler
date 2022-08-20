@@ -161,7 +161,7 @@ public class Building_ReverseCycleCooler : Building_Cooler
     {
         Rotation = new Rot4((Rotation.AsInt + 2) % 4);
 
-        if (ReplaceStuffFix.isWide(this)) // So you can rotate the wide cooler
+        if (ReplaceStuffFix.isWide(def.defName)) // So you can rotate the wide cooler
         {
             Position += IntVec3.South.RotatedBy(Rotation);
         }
