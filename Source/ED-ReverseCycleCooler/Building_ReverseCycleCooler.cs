@@ -96,12 +96,12 @@ public class Building_ReverseCycleCooler : Building_Cooler
         var props = compPowerTrader.Props;
         if (idle)
         {
-            compPowerTrader.PowerOutput = -props.basePowerConsumption;
+            compPowerTrader.PowerOutput = -props.PowerConsumption;
         }
         else
         {
             compPowerTrader.PowerOutput =
-                -props.basePowerConsumption * compTempControl.Props.lowPowerConsumptionFactor;
+                -props.PowerConsumption * compTempControl.Props.lowPowerConsumptionFactor;
         }
 
         compTempControl.operatingAtHighPower = idle;

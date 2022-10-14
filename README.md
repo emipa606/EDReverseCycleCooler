@@ -5,6 +5,9 @@
 Update of Jaxxas mod
 https://steamcommunity.com/sharedfiles/filedetails/?id=722092523
 
+- Changed the overwrite to a patch
+- Added support for the cooler and the 2w cooler in https://steamcommunity.com/sharedfiles/filedetails/?id=1372003680]Replace Stuff
+
 ![Image](https://i.imgur.com/pufA0kM.png)
 
 	

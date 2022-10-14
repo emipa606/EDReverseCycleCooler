@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <Operation Class="PatchOperationReplace">
+    <xpath>/Defs/ThingDef[defName="Cooler"]/thingClass</xpath>
+    <value>
+      <thingClass>EnhancedDevelopment.ReverseCycleCooler.Building_ReverseCycleCooler</thingClass>
+    </value>
+  </Operation>
+  <Operation Class="PatchOperationReplace">
+    <xpath>/Defs/ThingDef[defName="Cooler"]/placeWorkers</xpath>
+    <value>
+      <placeWorkers>
+        <li>EnhancedDevelopment.ReverseCycleCooler.PlaceWorker_ReverseCycleCooler</li>
+      </placeWorkers>
+    </value>
+  </Operation>
+</Patch>
