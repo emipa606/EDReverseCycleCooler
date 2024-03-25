@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -15,15 +14,9 @@ internal class PlaceWorker_ReverseCycleCooler : PlaceWorker
         var coldSide = center + IntVec3.South.RotatedBy(rot); // formerly known as intVec
         var hotSide = center + ReplaceStuffFix.adjustedNorth(def).RotatedBy(rot); // formerly known as intVec2
 
-        GenDraw.DrawFieldEdges(new List<IntVec3>
-        {
-            coldSide
-        }, Color.magenta);
+        GenDraw.DrawFieldEdges([coldSide], Color.magenta);
 
-        GenDraw.DrawFieldEdges(new List<IntVec3>
-        {
-            hotSide
-        }, GenTemperature.ColorSpotHot);
+        GenDraw.DrawFieldEdges([hotSide], GenTemperature.ColorSpotHot);
 
         var hotRoom = hotSide.GetRoom(currentMap); // formerly known as roomGroup
         var coldRoom = coldSide.GetRoom(currentMap); // formerly known as roomGroup2

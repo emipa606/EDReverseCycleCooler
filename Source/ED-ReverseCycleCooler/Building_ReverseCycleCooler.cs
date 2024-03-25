@@ -166,7 +166,7 @@ public class Building_ReverseCycleCooler : Building_Cooler
             Position += IntVec3.South.RotatedBy(Rotation);
         }
 
-        Map.mapDrawer.MapMeshDirty(Position, MapMeshFlag.Things, true, false);
+        Map.mapDrawer.MapMeshDirty(Position, MapMeshFlagDefOf.Things, true, false);
     }
 
     public void ChangeMode()
