@@ -9,6 +9,6 @@ public static class Main
 
     static Main()
     {
-        ReplaceStuffLoaded = ModLister.GetActiveModWithIdentifier("Uuugggg.ReplaceStuff") != null;
+        ReplaceStuffLoaded = ModLister.GetActiveModWithIdentifier("Uuugggg.ReplaceStuff", true) != null;
     }
 }

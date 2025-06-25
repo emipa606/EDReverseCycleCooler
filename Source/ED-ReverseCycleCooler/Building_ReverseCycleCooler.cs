@@ -12,12 +12,12 @@ public class Building_ReverseCycleCooler : Building_Cooler
     private const float HeatOutputMultiplier = 1.25f;
     private const float EfficiencyLossPerDegreeDifference = 1f / 130f;
 
-    private static readonly Texture2D UI_ROTATE_RIGHT = ContentFinder<Texture2D>.Get("UI/RotRight");
-    private static readonly Texture2D UI_TEMPERATURE_COOLING = ContentFinder<Texture2D>.Get("UI/Temperature_Cooling");
-    private static readonly Texture2D UI_TEMPERATURE_HEATING = ContentFinder<Texture2D>.Get("UI/Temperature_Heating");
-    private static readonly Texture2D UI_TEMPERATURE_AUTO = ContentFinder<Texture2D>.Get("UI/Temperature_Auto");
+    private static readonly Texture2D uiRotateRight = ContentFinder<Texture2D>.Get("UI/RotRight");
+    private static readonly Texture2D uiTemperatureCooling = ContentFinder<Texture2D>.Get("UI/Temperature_Cooling");
+    private static readonly Texture2D uiTemperatureHeating = ContentFinder<Texture2D>.Get("UI/Temperature_Heating");
+    private static readonly Texture2D uiTemperatureAuto = ContentFinder<Texture2D>.Get("UI/Temperature_Auto");
 
-    private enumCoolerMode m_Mode;
+    private EnumCoolerMode mMode;
 
     public override void TickRare()
     {
@@ -27,7 +27,7 @@ public class Building_ReverseCycleCooler : Building_Cooler
         }
 
         var coldSide = Position + IntVec3.South.RotatedBy(Rotation); // formerly known as intVect
-        var hotSide = Position + ReplaceStuffFix.adjustedNorth(this).RotatedBy(Rotation); // formerly known as intVect2
+        var hotSide = Position + ReplaceStuffFix.AdjustedNorth(this).RotatedBy(Rotation); // formerly known as intVect2
 
         var idle = false;
         if (!hotSide.Impassable(Map) && !coldSide.Impassable(Map))
@@ -36,12 +36,12 @@ public class Building_ReverseCycleCooler : Building_Cooler
             var temperatureOnCold = coldSide.GetTemperature(Map); // formerly known as temperature2
             var cooling = true;
 
-            switch (m_Mode)
+            switch (mMode)
             {
-                case enumCoolerMode.Heating:
+                case EnumCoolerMode.Heating:
                     cooling = false;
                     break;
-                case enumCoolerMode.Auto:
+                case EnumCoolerMode.Auto:
                     cooling = temperatureOnHot > compTempControl.targetTemperature;
                     break;
             }
@@ -116,39 +116,39 @@ public class Building_ReverseCycleCooler : Building_Cooler
 
         yield return new Command_Action
         {
-            action = ChangeRotation,
-            icon = UI_ROTATE_RIGHT,
+            action = changeRotation,
+            icon = uiRotateRight,
             defaultLabel = "Rotate",
             defaultDesc = "Rotates",
             activateSound = SoundDef.Named("Click")
         };
-        switch (m_Mode)
+        switch (mMode)
         {
-            case enumCoolerMode.Cooling:
+            case EnumCoolerMode.Cooling:
                 yield return new Command_Action
                 {
-                    action = ChangeMode,
-                    icon = UI_TEMPERATURE_COOLING,
+                    action = changeMode,
+                    icon = uiTemperatureCooling,
                     defaultLabel = "Cooling",
                     defaultDesc = "Cooling",
                     activateSound = SoundDef.Named("Click")
                 };
                 break;
-            case enumCoolerMode.Heating:
+            case EnumCoolerMode.Heating:
                 yield return new Command_Action
                 {
-                    action = ChangeMode,
-                    icon = UI_TEMPERATURE_HEATING,
+                    action = changeMode,
+                    icon = uiTemperatureHeating,
                     defaultLabel = "Heating",
                     defaultDesc = "Heating",
                     activateSound = SoundDef.Named("Click")
                 };
                 break;
-            case enumCoolerMode.Auto:
+            case EnumCoolerMode.Auto:
                 yield return new Command_Action
                 {
-                    action = ChangeMode,
-                    icon = UI_TEMPERATURE_AUTO,
+                    action = changeMode,
+                    icon = uiTemperatureAuto,
                     defaultLabel = "Auto",
                     defaultDesc = "Auto",
                     activateSound = SoundDef.Named("Click")
@@ -157,11 +157,11 @@ public class Building_ReverseCycleCooler : Building_Cooler
         }
     }
 
-    public void ChangeRotation()
+    private void changeRotation()
     {
         Rotation = new Rot4((Rotation.AsInt + 2) % 4);
 
-        if (ReplaceStuffFix.isWide(def.defName)) // So you can rotate the wide cooler
+        if (ReplaceStuffFix.IsWide(def.defName)) // So you can rotate the wide cooler
         {
             Position += IntVec3.South.RotatedBy(Rotation);
         }
@@ -169,18 +169,18 @@ public class Building_ReverseCycleCooler : Building_Cooler
         Map.mapDrawer.MapMeshDirty(Position, MapMeshFlagDefOf.Things, true, false);
     }
 
-    public void ChangeMode()
+    private void changeMode()
     {
-        switch (m_Mode)
+        switch (mMode)
         {
-            case enumCoolerMode.Cooling:
-                m_Mode = enumCoolerMode.Heating;
+            case EnumCoolerMode.Cooling:
+                mMode = EnumCoolerMode.Heating;
                 return;
-            case enumCoolerMode.Heating:
-                m_Mode = enumCoolerMode.Auto;
+            case EnumCoolerMode.Heating:
+                mMode = EnumCoolerMode.Auto;
                 return;
-            case enumCoolerMode.Auto:
-                m_Mode = enumCoolerMode.Cooling;
+            case EnumCoolerMode.Auto:
+                mMode = EnumCoolerMode.Cooling;
                 break;
         }
     }
@@ -188,15 +188,15 @@ public class Building_ReverseCycleCooler : Building_Cooler
     public override string GetInspectString()
     {
         var stringBuilder = new StringBuilder();
-        switch (m_Mode)
+        switch (mMode)
         {
-            case enumCoolerMode.Cooling:
+            case EnumCoolerMode.Cooling:
                 stringBuilder.AppendLine("Mode: Cooling");
                 break;
-            case enumCoolerMode.Heating:
+            case EnumCoolerMode.Heating:
                 stringBuilder.AppendLine("Mode: Heating");
                 break;
-            case enumCoolerMode.Auto:
+            case EnumCoolerMode.Auto:
                 stringBuilder.AppendLine("Mode: Auto");
                 break;
         }
@@ -208,6 +208,6 @@ public class Building_ReverseCycleCooler : Building_Cooler
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref m_Mode, "m_Mode");
+        Scribe_Values.Look(ref mMode, "m_Mode");
     }
 }

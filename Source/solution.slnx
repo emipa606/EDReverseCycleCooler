@@ -1,0 +1,6 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Release" />
+  </Configurations>
+  <Project Path="ED-ReverseCycleCooler/ED-ReverseCycleCooler.csproj" />
+</Solution>

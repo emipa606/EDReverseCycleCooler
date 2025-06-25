@@ -12,7 +12,7 @@ internal class PlaceWorker_ReverseCycleCooler : PlaceWorker
         var currentMap = Find.CurrentMap;
 
         var coldSide = center + IntVec3.South.RotatedBy(rot); // formerly known as intVec
-        var hotSide = center + ReplaceStuffFix.adjustedNorth(def).RotatedBy(rot); // formerly known as intVec2
+        var hotSide = center + ReplaceStuffFix.AdjustedNorth(def).RotatedBy(rot); // formerly known as intVec2
 
         GenDraw.DrawFieldEdges([coldSide], Color.magenta);
 
@@ -46,7 +46,7 @@ internal class PlaceWorker_ReverseCycleCooler : PlaceWorker
         Thing thingToIgnore = null, Thing thing = null)
     {
         var coldSide = center + IntVec3.South.RotatedBy(rot); // formerly known as intVec
-        var hotSide = center + ReplaceStuffFix.adjustedNorth(def).RotatedBy(rot); // formerly known as intVec2
+        var hotSide = center + ReplaceStuffFix.AdjustedNorth(def).RotatedBy(rot); // formerly known as intVec2
 
         if (coldSide.Impassable(map) || hotSide.Impassable(map))
         {
@@ -55,20 +55,16 @@ internal class PlaceWorker_ReverseCycleCooler : PlaceWorker
 
         var firstFrameOnCold = coldSide.GetFirstThing<Frame>(map); // formerly known as firstThing
         var firstFrameOnHot = hotSide.GetFirstThing<Frame>(map); // formerly known as firstThing2
-        if (firstFrameOnCold != null && firstFrameOnCold.def.entityDefToBuild is
-                { passability: Traversability.Impassable } ||
-            firstFrameOnHot != null && firstFrameOnHot.def.entityDefToBuild is
-                { passability: Traversability.Impassable })
+        if (firstFrameOnCold?.def.entityDefToBuild is { passability: Traversability.Impassable } ||
+            firstFrameOnHot?.def.entityDefToBuild is { passability: Traversability.Impassable })
         {
             return "MustPlaceCoolerWithFreeSpaces".Translate();
         }
 
         var firstBlueprintOnCold = coldSide.GetFirstThing<Blueprint>(map); // formerly known as firstThing3
         var firstBlueprintOnHot = hotSide.GetFirstThing<Blueprint>(map); // formerly known as firstThing4
-        if (firstBlueprintOnCold != null && firstBlueprintOnCold.def.entityDefToBuild is
-                { passability: Traversability.Impassable } ||
-            firstBlueprintOnHot != null &&
-            firstBlueprintOnHot.def.entityDefToBuild is { passability: Traversability.Impassable })
+        if (firstBlueprintOnCold?.def.entityDefToBuild is { passability: Traversability.Impassable } ||
+            firstBlueprintOnHot?.def.entityDefToBuild is { passability: Traversability.Impassable })
         {
             return "MustPlaceCoolerWithFreeSpaces".Translate();
         }
