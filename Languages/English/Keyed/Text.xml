@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <EDRC.Mode>Mode: {0}</EDRC.Mode>
+  <EDRC.Heating>Heating</EDRC.Heating>
+  <EDRC.HeatingDesc>Will work as a regular heater</EDRC.HeatingDesc>
+  <EDRC.Cooling>Cooling</EDRC.Cooling>
+  <EDRC.CoolingDesc>Will work as a regular cooler</EDRC.CoolingDesc>
+  <EDRC.Auto>Auto</EDRC.Auto>
+  <EDRC.AutoDesc>Will automatically heat or cool as needed</EDRC.AutoDesc>
+  <EDRC.Rotate>Rotate</EDRC.Rotate>
+  <EDRC.RotateDesc>Switch input and output places</EDRC.RotateDesc>
+</LanguageData>

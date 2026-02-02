@@ -118,8 +118,8 @@ public class Building_ReverseCycleCooler : Building_Cooler
         {
             action = changeRotation,
             icon = uiRotateRight,
-            defaultLabel = "Rotate",
-            defaultDesc = "Rotates",
+            defaultLabel = "EDRC.Rotate".Translate(),
+            defaultDesc = "EDRC.RotateDesc".Translate(),
             activateSound = SoundDef.Named("Click")
         };
         switch (mMode)
@@ -129,8 +129,8 @@ public class Building_ReverseCycleCooler : Building_Cooler
                 {
                     action = changeMode,
                     icon = uiTemperatureCooling,
-                    defaultLabel = "Cooling",
-                    defaultDesc = "Cooling",
+                    defaultLabel = "EDRC.Cooling".Translate(),
+                    defaultDesc = "EDRC.CoolingDesc".Translate(),
                     activateSound = SoundDef.Named("Click")
                 };
                 break;
@@ -139,8 +139,8 @@ public class Building_ReverseCycleCooler : Building_Cooler
                 {
                     action = changeMode,
                     icon = uiTemperatureHeating,
-                    defaultLabel = "Heating",
-                    defaultDesc = "Heating",
+                    defaultLabel = "EDRC.Heating".Translate(),
+                    defaultDesc = "EDRC.HeatingDesc".Translate(),
                     activateSound = SoundDef.Named("Click")
                 };
                 break;
@@ -149,8 +149,8 @@ public class Building_ReverseCycleCooler : Building_Cooler
                 {
                     action = changeMode,
                     icon = uiTemperatureAuto,
-                    defaultLabel = "Auto",
-                    defaultDesc = "Auto",
+                    defaultLabel = "EDRC.Auto".Translate(),
+                    defaultDesc = "EDRC.AutoDesc".Translate(),
                     activateSound = SoundDef.Named("Click")
                 };
                 break;
@@ -191,13 +191,13 @@ public class Building_ReverseCycleCooler : Building_Cooler
         switch (mMode)
         {
             case EnumCoolerMode.Cooling:
-                stringBuilder.AppendLine("Mode: Cooling");
+                stringBuilder.AppendLine("EDRC.Mode".Translate("EDRC.Cooling".Translate()));
                 break;
             case EnumCoolerMode.Heating:
-                stringBuilder.AppendLine("Mode: Heating");
+                stringBuilder.AppendLine("EDRC.Mode".Translate("EDRC.Heating".Translate()));
                 break;
             case EnumCoolerMode.Auto:
-                stringBuilder.AppendLine("Mode: Auto");
+                stringBuilder.AppendLine("EDRC.Mode".Translate("EDRC.Auto".Translate()));
                 break;
         }
 

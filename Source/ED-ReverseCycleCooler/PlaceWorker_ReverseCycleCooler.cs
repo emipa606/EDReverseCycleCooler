@@ -14,7 +14,7 @@ internal class PlaceWorker_ReverseCycleCooler : PlaceWorker
         var coldSide = center + IntVec3.South.RotatedBy(rot); // formerly known as intVec
         var hotSide = center + ReplaceStuffFix.AdjustedNorth(def).RotatedBy(rot); // formerly known as intVec2
 
-        GenDraw.DrawFieldEdges([coldSide], Color.magenta);
+        GenDraw.DrawFieldEdges([coldSide], Color.green);
 
         GenDraw.DrawFieldEdges([hotSide], GenTemperature.ColorSpotHot);
 
@@ -38,7 +38,7 @@ internal class PlaceWorker_ReverseCycleCooler : PlaceWorker
 
         if (!coldRoom.UsesOutdoorTemperature)
         {
-            GenDraw.DrawFieldEdges(coldRoom.Cells.ToList(), Color.magenta);
+            GenDraw.DrawFieldEdges(coldRoom.Cells.ToList(), Color.green);
         }
     }
 
