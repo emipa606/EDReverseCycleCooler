@@ -1,5 +1,8 @@
 # Changelog for EDReverseCycleCooler
 
+1.6.2 - Fixed asset bundle due to the amount of textures
+
+
 1.6.1 - Clearer colors and icons
 Used DeepL to update translations for ChineseSimplified, French, German
 
