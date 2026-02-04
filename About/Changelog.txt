@@ -1,5 +1,8 @@
 # Changelog for EDReverseCycleCooler
 
+1.6.3 - Not using asset bundle as the textures are override-textures
+
+
 1.6.2 - Fixed asset bundle due to the amount of textures
 
 
