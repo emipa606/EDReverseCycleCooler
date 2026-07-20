@@ -88,7 +88,12 @@ public class Building_ReverseCycleCooler : Building_Cooler
 
             if (idle)
             {
-                hotSide.GetRoom(Map).Temperature -= newTemp;
+                var room = hotSide.GetRoom(Map);
+                if (!room.UsesOutdoorTemperature)
+                {
+                    room.Temperature -= newTemp;
+                }
+
                 GenTemperature.PushHeat(coldSide, Map, energyLimit * HeatOutputMultiplier);
             }
         }

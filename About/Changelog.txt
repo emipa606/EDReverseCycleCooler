@@ -1,5 +1,8 @@
 # Changelog for EDReverseCycleCooler
 
+1.6.4 - Check for outdoor-temp before setting temperature
+
+
 1.6.3 - Not using asset bundle as the textures are override-textures
 
 
