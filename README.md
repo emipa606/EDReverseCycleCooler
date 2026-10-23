@@ -32,4 +32,4 @@ Additionally the mod adds a button that allows you to rotate already placed cool
 
  
 
-[![Image](https://img.shields.io/github/v/release/emipa606/EDReverseCycleCooler?label=latest%20version&style=plastic&color=9f1111&labelColor=black)](https://steamcommunity.com/sharedfiles/filedetails/changelog/2565870562) | tags: temperature control, room cooling, reverse cycle
+[![Image](https://img.shields.io/github/v/release/emipa606/EDReverseCycleCooler?label=latest%20version&style=plastic&color=9f1111&labelColor=black)](https://steamcommunity.com/sharedfiles/filedetails/changelog/2565870562) | 1.6, Mod, 1.5, 1.2, 1.3, 1.0, 1.4, 1.1

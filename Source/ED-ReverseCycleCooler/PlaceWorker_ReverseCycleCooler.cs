@@ -42,11 +42,11 @@ internal class PlaceWorker_ReverseCycleCooler : PlaceWorker
         }
     }
 
-    public override AcceptanceReport AllowsPlacing(BuildableDef def, IntVec3 center, Rot4 rot, Map map,
+    public override AcceptanceReport AllowsPlacing(BuildableDef checkingDef, IntVec3 loc, Rot4 rot, Map map,
         Thing thingToIgnore = null, Thing thing = null)
     {
-        var coldSide = center + IntVec3.South.RotatedBy(rot); // formerly known as intVec
-        var hotSide = center + ReplaceStuffFix.AdjustedNorth(def).RotatedBy(rot); // formerly known as intVec2
+        var coldSide = loc + IntVec3.South.RotatedBy(rot); // formerly known as intVec
+        var hotSide = loc + ReplaceStuffFix.AdjustedNorth(checkingDef).RotatedBy(rot); // formerly known as intVec2
 
         if (coldSide.Impassable(map) || hotSide.Impassable(map))
         {

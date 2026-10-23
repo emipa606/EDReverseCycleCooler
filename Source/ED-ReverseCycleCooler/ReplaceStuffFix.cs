@@ -5,7 +5,7 @@ namespace EnhancedDevelopment.ReverseCycleCooler;
 | This file contains everything necesary for Replace Stuff's Over wall coolers work properly |
 \********************************************************************************************/
 
-internal class ReplaceStuffFix
+internal static class ReplaceStuffFix
 {
     public static bool IsWide(string defName)
     {

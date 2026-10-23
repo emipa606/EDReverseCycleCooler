@@ -1,40 +1,56 @@
 # GitHub Copilot Instructions for ED-ReverseCycleCooler (Continued)
 
 ## Mod Overview and Purpose
-The ED-ReverseCycleCooler mod transforms the standard cooler in RimWorld into a versatile Reverse Cycle Air Conditioner. Originally created by Jaxxa, this updated version by Mlie enhances the cooler's functionality by allowing it to both heat and cool rooms. The mod seamlessly integrates into RimWorld, offering players the flexibility to manage room temperatures with greater precision.
 
-## Key Features and Systems
-- **Reverse Cycle Functionality:** The cooler can be set to heating mode to warm rooms or cooling mode to cool them, similar to a real-world reverse cycle air conditioner.
-- **Automatic Mode:** Automatically heats or cools the room to reach a desired temperature.
-- **Rotatable Coolers:** A new button feature that allows players to rotate an already placed cooler, correcting placement errors without requiring deconstruction.
-- **Support for Replace Stuff Mod:** Ensures compatibility and functionality with coolers and 2-wide coolers when using the Replace Stuff mod.
+### Mod Name:
+ED-ReverseCycleCooler (Continued)
+
+### Mod Description:
+This mod is an update of Jaxxa's original Reverse Cycle Cooler mod, providing enhancements and additional functionality for cooler units in RimWorld. The primary purpose of the mod is to allow the game's existing coolers to function as reverse cycle air conditioners. 
+
+### Version:
+2.0.0.0
+
+### Key Features:
+- **Reverse Cycle Functionality**: This mod allows coolers to work both as traditional cooling units and as heaters. In heating mode, a cooler will output warm air into the target room while exhausting cold air, functioning like a reverse cycle air conditioner.
+- **Automatic Temperature Control**: Coolers can be set to automatically heat or cool a room to maintain a target temperature.
+- **Rotatable Coolers**: The mod introduces a button that enables players to rotate already placed coolers to correct any placement mistakes.
+- **Compatibility Enhancements**: Added support for compatibility with the 'Replace Stuff' mod, which allows swapping of furniture and building items seamlessly without deconstructing.
 
 ## Coding Patterns and Conventions
-The mod's source code follows several key programming patterns:
-- **Object-Oriented Design:** Using classes to encapsulate cooler functionality (`Building_ReverseCycleCooler`) and enum types for mode selection (`EnumCoolerMode`).
-- **Encapsulation:** Utilizes methods such as `changeMode` and `changeRotation` to change the cooler's state.
-- **Modularity:** Efficient function separation with specific methods handling data exposure (`ExposeData`) and game-specific functionalities (`GetGizmos`, `GetInspectString`, `TickRare`).
+
+- **C# Coding Standards**: Follow consistent naming conventions for classes (PascalCase), methods (camelCase), and variables (camelCase).
+- **Maintain Readability**: Write descriptive comments especially where complex logic is involved. Utilize region tags to organize code sections logically.
+- **Class and Method Design**: Use single responsibility principle to ensure that classes and methods are focused and cohesive.
+- **Error Handling**: Implement basic error handling to capture and log unexpected behaviors for better debugging.
 
 ## XML Integration
-The mod includes several XML files that support its integration:
-- **Defs:** `Buildings_Temperature.xml` defines the cooler's properties and behaviors within the game world.
-- **Patches:** `CoolerChange.xml` contains Harmony patches that modify the existing coolers' functionality without overwriting the base game files.
-- **About Information:** `About.xml` provides metadata about the mod, such as the author and package ID.
+
+- **XML File Locations**: Ensure all XML files are properly placed within the 'Defs' and 'Patches' directories. For this mod, definitions are located in:
+  - `Source\Defs\ThingDefs\`
+  - `Patches\`
+- **ThingDef Modifications**: Use XML to override and patch ThingDefs to integrate new behaviors or modify existing definitions.
+
+### XML Files Explained:
+- `CoolerChange.xml`: Contains patch instructions for altering cooler functions.
+- `About.xml`: Provides metadata about the mod and is essential for the mod's identification by the game.
+- `Buildings_Temperature.xml`: Defines the properties and capabilities of temperature-related buildings such as coolers.
 
 ## Harmony Patching
-The mod uses Harmony for code patching to safely and effectively extend RimWorld's functionality:
-- **Non-invasive Modifications:** The transition from overwrite to patching ensures that the mod's changes are layered on top of the base game functionalities, minimizing conflicts.
-- **Compatibility Updates:** Additional patches ensure the cooler remains compatible with other mods, such as Replace Stuff, by adjusting specific functionalities (e.g., `ReplaceStuffFix`).
 
-## Suggestions for Copilot
-When using GitHub Copilot, consider the following suggestions to maintain and enhance this mod:
-- **Automate Routine Tasks:** Use Copilot to generate repetitive C# and XML code snippets, such as method signatures, XML def structures, and property setters/getters.
-- **AI-Assisted Refactoring:** Seek Copilot's assistance in refactoring code for improved readability and maintainability, especially complex switch cases or conditional logic in `Building_ReverseCycleCooler`.
-- **Documentation Enhancement:** Leverage Copilot to enhance inline code comments and XML documentation to better explain mod logic and configurations.
-- **Bug Identification and Fixing:** Use Copilot for introducing debug loggers or exception handling constructs, aiding in troubleshooting and resolving mod errors effectively.
-- **Feature Expansion Ideas:** Consider suggestions by Copilot during code editing to explore new functionalities or enhance existing features.
+Harmony is employed to modify existing game functions without altering the original source code directly.
 
-By following these instructions and utilizing GitHub Copilot effectively, you can ensure the continued development and improvement of the ED-ReverseCycleCooler mod.
+- **Basic Usage**: Use Harmony to patch methods in RimWorld’s codebase, enabling the added functionalities of the mod.
+- **Patch Example**: Transition from overwrite to patching mechanisms to enhance compatibility and stability when other mods are active. 
+
+## Suggestions for Using GitHub Copilot
+
+- **Code Completion**: Use Copilot to generate boilerplate for new features, ensuring that it aligns with the existing patterns and conventions.
+- **Testing and Error Handling**: Allow Copilot to suggest unit test models which can be invaluable for validating new functionalities.
+- **Refactoring Suggestions**: Invite Copilot to propose optimized or more efficient code paths, particularly when making broad alterations or improvements.
+- **Documentation Aid**: Utilize Copilot for generating XML summaries and comments where they are lacking or outdated.
+
+This document should guide anyone involved in developing and maintaining the ED-ReverseCycleCooler mod, providing a structured approach to managing the codebase and collaborating effectively using GitHub and Copilot. For any intricate or mod-specific issues, reference the logs and use community resources effectively as outlined in the mod documentation.
 
 ## Project Solution Guidelines
 - Relevant mod XML files are included as Solution Items under the solution folder named XML, these can be read and modified from within the solution.
@@ -48,4 +64,6 @@ By following these instructions and utilizing GitHub Copilot effectively, you ca
 ## Hard rules (must follow)
 - Do NOT run commands that modify the repo (no git commit, git apply, dotnet format) unless explicitly asked.
 - Prefer minimal reads: read only the smallest code region needed (around the suspicious lines).
+- When mentioning SonarQube issues, automatically use the SonarQube MCP service to fetch and address issues instead of making inferred fixes without querying SonarQube first.
+- When mentioning the rimworld log, automatically use the Rimworld MCP service to fetch the log.
 
